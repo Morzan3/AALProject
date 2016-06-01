@@ -1,4 +1,5 @@
-from PIL import Image
+from PIL import Image, ImageDraw
+from random import randint
 import time
 
 class UserImage:
@@ -14,6 +15,10 @@ class UserImage:
             self.coloured_pixels = 0
             self.processed_pixels = 0
             self.last_algorythm_time = 0
+            self.total_coloured_pixels = 0
+            self.total_pixels_visited = 0
+            self.total_processed_pixels = 0
+            self.total_algorythm_time = 0
 
 
         else:
@@ -27,6 +32,10 @@ class UserImage:
             self.coloured_pixels = 0
             self.processed_pixels = 0
             self.last_algorythm_time = 0
+            self.total_coloured_pixels = 0
+            self.total_pixels_visited = 0
+            self.total_processed_pixels = 0
+            self.total_algorythm_time = 0
 
     def start_algorythm(self, x_coordinate, y_cordinate):
         t0 = time.clock()
@@ -51,58 +60,48 @@ class UserImage:
                 break
 
             (x_value, y_value) = coordinates
-            try:
 
-            #if x_value < self.image.size[0] - 1:
+
+            if x_value < self.image.size[0] - 1:
                 if self.pixelMap[x_value + 1, y_value] == area_color:
                     self.pixelMap[x_value + 1, y_value] = self.base_color
                     coordinate_list.append((x_value + 1, y_value))
                     self.coloured_pixels += 1
                 else:
-                    print(self.pixelMap[x_value + 1, y_value])
                     self.visited_pixels += 1
-                    if self.visited_pixels == 120000:
-                        print("Teraz")
 
-            #if x_value > 0:
+
+            if x_value > 0:
                 if self.pixelMap[x_value - 1, y_value] == area_color:
                     self.pixelMap[x_value - 1, y_value] = self.base_color
                     coordinate_list.append((x_value - 1, y_value))
                     self.coloured_pixels += 1
                 else:
-                    print(self.pixelMap[x_value - 1, y_value])
                     self.visited_pixels += 1
-                    if self.visited_pixels == 120000:
-                        print("Teraz")
 
-            #if y_value < self.image.size[1] - 1:
+
+            if y_value < self.image.size[1] - 1:
                 if self.pixelMap[x_value, y_value + 1] == area_color:
                     self.pixelMap[x_value, y_value + 1] = self.base_color
                     coordinate_list.append((x_value, y_value + 1))
                     self.coloured_pixels += 1
                 else:
-                    print(self.pixelMap[x_value, y_value + 1])
                     self.visited_pixels += 1
-                    if self.visited_pixels == 120000:
-                        print("Teraz")
 
-            #if y_value > 0:
+
+            if y_value > 0:
                 if self.pixelMap[x_value, y_value - 1] == area_color:
                     self.pixelMap[x_value, y_value - 1] = self.base_color
                     coordinate_list.append((x_value, y_value - 1))
                     self.coloured_pixels += 1
                 else:
-                    print(self.pixelMap[x_value , y_value - 1])
                     self.visited_pixels += 1
-                    if self.visited_pixels == 120000:
-                        print("Teraz")
-
-            except IndexError:
-                continue
-
 
         self.last_algorythm_time = time.clock() - t0
-        # self.test()
+        self.total_algorythm_time += self.last_algorythm_time
+        self.total_coloured_pixels += self.coloured_pixels
+        self.total_pixels_visited += self.visited_pixels
+        self.total_processed_pixels += self.processed_pixels
 
     def display_image(self):
         self.image.show()
@@ -119,13 +118,61 @@ class UserImage:
         self.base_color = new_base_color
 
 
-    def test(self):
-        for i in range (self.image_width):
-            for j in range(self.image_height):
-                print (self.pixelMap[i,j])
-
-
     def color_pixel(self,x_coordinate, y_coordinate):
         if x_coordinate < self.image_width and y_coordinate < self.image_height:
             self.pixelMap[x_coordinate,y_coordinate] = (0,0,255)
+
+
+    def draw_random_line(self):
+        draw = ImageDraw.Draw(self.image)
+        if randint(0,1) == 0:
+            if randint(0, 1) == 0:
+                start_x = 0
+                start_y = randint(0, self.image_height - 1)
+            else:
+                start_x = self.image_width -1
+                start_y = randint(0, self.image_height - 1)
+        else:
+            if randint(0, 1) == 0:
+                start_y = 0
+                start_x = randint(0, self.image_width - 1)
+            else:
+                start_y = self.image_height-1
+                start_x = randint(0, self.image_width - 1)
+
+        if randint(0, 1) == 0:
+            if randint(0, 1) == 0:
+                end_x = 0
+                end_y = randint(0, self.image_height - 1)
+            else:
+                end_x = self.image_width - 1
+                end_y = randint(0, self.image_height - 1)
+        else:
+            if randint(0, 1) == 0:
+                end_y = 0
+                end_x = randint(0, self.image_width - 1)
+            else:
+                end_y = self.image_height-1
+                end_x = randint(0, self.image_width - 1)
+
+        if start_x == end_x and start_x == 0:
+            start_x = self.image_width-1
+        elif start_x == end_x and start_x == self.image_width - 1:
+            start_x = 0
+
+        if start_y == end_y and start_y == 0:
+            start_y = self.image_height-1
+        elif start_y == end_y and start_y == self.image_height - 1:
+            start_y = 0
+
+        draw.line(((start_x,start_y),(end_x,end_y)), fill=128)
+
+    def generate_random_algorythm_start(self):
+        x = randint(0, self.image_width - 1)
+        y = randint(0, self.image_height - 1)
+
+        if self.pixelMap[x,y] == (128,0,0) or self.pixelMap[x,y] == (255,255,255):
+            self.generate_random_algorythm_start()
+        else:
+            self.start_algorythm(x,y)
 
