@@ -1,3 +1,7 @@
+#Ignacy Ślusarczyk
+#Nr indeksu: 261521
+#islusarc@mion.elka.pw.edu.pl
+#Algorytm kolorowania obszarów spójnych
 from PIL import Image, ImageDraw
 from random import randint
 import time
@@ -38,9 +42,9 @@ class UserImage:
             self.total_algorythm_time = 0
 
     def start_algorythm(self, x_coordinate, y_cordinate):
-        t0 = time.clock()
+
         if self.pixelMap[x_coordinate, y_cordinate] != self.base_color:
-            area_color = self.pixelMap[x_coordinate, y_cordinate];
+            area_color = self.pixelMap[x_coordinate, y_cordinate]
             self.pixelMap[x_coordinate, y_cordinate] = self.base_color
             self.coloured_pixels = 1
             self.visited_pixels = 0
@@ -61,14 +65,16 @@ class UserImage:
 
             (x_value, y_value) = coordinates
 
-
-            if x_value < self.image.size[0] - 1:
+            t0 = time.clock()
+            if x_value < self.image_width - 1:
                 if self.pixelMap[x_value + 1, y_value] == area_color:
                     self.pixelMap[x_value + 1, y_value] = self.base_color
                     coordinate_list.append((x_value + 1, y_value))
                     self.coloured_pixels += 1
                 else:
                     self.visited_pixels += 1
+            else:
+                self.visited_pixels += 1
 
 
             if x_value > 0:
@@ -78,16 +84,19 @@ class UserImage:
                     self.coloured_pixels += 1
                 else:
                     self.visited_pixels += 1
+            else:
+                self.visited_pixels += 1
 
 
-            if y_value < self.image.size[1] - 1:
+            if y_value < self.image_height - 1:
                 if self.pixelMap[x_value, y_value + 1] == area_color:
                     self.pixelMap[x_value, y_value + 1] = self.base_color
                     coordinate_list.append((x_value, y_value + 1))
                     self.coloured_pixels += 1
                 else:
                     self.visited_pixels += 1
-
+            else:
+                self.visited_pixels += 1
 
             if y_value > 0:
                 if self.pixelMap[x_value, y_value - 1] == area_color:
@@ -96,12 +105,18 @@ class UserImage:
                     self.coloured_pixels += 1
                 else:
                     self.visited_pixels += 1
+            else:
+                self.visited_pixels += 1
 
-        self.last_algorythm_time = time.clock() - t0
+            self.last_algorythm_time += time.clock() - t0
+
+
         self.total_algorythm_time += self.last_algorythm_time
         self.total_coloured_pixels += self.coloured_pixels
         self.total_pixels_visited += self.visited_pixels
         self.total_processed_pixels += self.processed_pixels
+        self.total_pixels_visited -= 1
+        return 1
 
     def display_image(self):
         self.image.show()
@@ -112,7 +127,7 @@ class UserImage:
         print("Liczba pixeli zamalowanych: ", self.coloured_pixels)
         print("Liczba pixeli przetworzonych (n)", self.processed_pixels)
         print("Maxymalna możliwa liczba odwiedzonych i zamalowanych pixeli", 4*self.processed_pixels + 1)
-        print("Czas dzialania alforytmu: ", self.last_algorythm_time)
+        print("Czas dzialania algorytmu: ", self.last_algorythm_time)
 
     def set_base_color(self, new_base_color):
         self.base_color = new_base_color
